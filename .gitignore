@@ -164,6 +164,9 @@ data/paraphrased/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/paraphrased/.gitkeep
+!data/raw/human_texts.csv
+!data/raw/ai_texts.csv
+!data/paraphrased/ai_texts_paraphrased.csv
 
 # Models
 models/

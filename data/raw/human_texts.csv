@@ -1,0 +1,14 @@
+sample_id,domain,text
+human_01,review,"The restaurant felt calm even during dinner rush, and the servers kept water glasses filled without being asked. My pasta arrived hot and balanced, so I would gladly return."
+human_02,review,"I bought these headphones for commuting. The battery lasted all week, but the ear pads got uncomfortable after an hour, so my opinion is mixed."
+human_03,essay,"Cities should invest in public libraries because they offer quiet study space, internet access, and community programming that many families cannot easily afford elsewhere."
+human_04,essay,"Online courses work best when students build routines. Flexibility is useful, but regular deadlines and active discussion make independent learning more realistic."
+human_05,review,"The hotel lobby looked polished, yet the room smelled slightly damp. Maintenance fixed the heater quickly, which helped rescue an otherwise average stay."
+human_06,essay,"Team projects can improve communication skills, although they also reveal how uneven workloads create frustration. Clear roles reduce most of that tension."
+human_07,review,"This coffee maker is simple to use and brews quickly. Cleanup takes only a minute, but the carafe lid drips if I pour too fast."
+human_08,essay,"Exercise improves mental focus for many students because movement interrupts long periods of sitting and can lower stress before difficult academic work."
+human_09,review,"The game starts slowly, though the final chapters add enough tension to make the story memorable. I mostly enjoyed the characters more than the combat."
+human_10,essay,"Part-time jobs teach time management in a way that lectures rarely do. Students learn to prioritize because missed shifts and missed assignments both carry visible consequences."
+human_11,review,"The jacket blocks wind better than I expected, and the zipper feels sturdy. I only wish the inside pocket were large enough for a phone."
+human_12,essay,"Neighborhood parks matter because they provide free space for exercise and informal social interaction. Communities often underestimate how much shared space supports public health."
+
