@@ -4,13 +4,14 @@
 
 This repository contains a CS 4365 project titled **Robust Detection of AI-Generated Text Under Paraphrasing**.
 
-The current implementation covers the early experimental baseline:
+The current implementation covers the Week 3-6 experimental foundation:
 
-- seed datasets for human-written text, AI-generated text, and paraphrased AI-generated text
-- a lightweight TF-IDF feature pipeline
-- a binary logistic regression classifier implemented in `numpy`
-- an evaluation pipeline that compares clean-text performance against paraphrased-text performance
-- unit tests for the basic pipeline components
+- expanded seed datasets for human-written text and AI-generated text
+- a deterministic paraphrase generator with `light`, `moderate`, and `heavy` levels
+- a TF-IDF + logistic regression baseline
+- a stronger neural comparison model based on learned token embeddings
+- an evaluation pipeline that compares clean-text performance against multiple paraphrase levels
+- unit tests for the core pipeline components
 
 The main research question is whether supervised AI-text detectors remain reliable when AI-generated text is paraphrased.
 
@@ -45,17 +46,29 @@ pip install -r requirements.txt
 
 All commands below should be run from the repository root.
 
-### Run the baseline experiment
+### Generate paraphrases
 
 ```bash
-PYTHONPATH=src python3 -m aidetect.cli
+PYTHONPATH=src python3 -m aidetect.cli generate-paraphrases
+```
+
+This command will:
+
+- read the AI-written dataset from `data/raw/ai_texts.csv`
+- generate paraphrased versions at `light`, `moderate`, and `heavy` levels
+- write the resulting dataset to `data/paraphrased/ai_texts_paraphrased.csv`
+
+### Run the full experiment
+
+```bash
+PYTHONPATH=src python3 -m aidetect.cli run
 ```
 
 This command will:
 
 - load the datasets from `data/raw/` and `data/paraphrased/`
-- train the TF-IDF + logistic regression baseline
-- evaluate on a clean test split and a paraphrased test split
+- train both implemented models
+- evaluate on a clean test split plus three paraphrase-intensity test splits
 - write outputs into `data/processed/`
 
 Expected generated files:
@@ -64,10 +77,8 @@ Expected generated files:
 - `data/processed/baseline_model.json`
 - `data/processed/baseline_predictions.csv`
 - `data/processed/baseline_confusion_matrix.svg`
-
-Additional generated artifact currently present:
-
-- `data/processed/baseline_robustness_summary.svg`
+- `data/processed/model_comparison.json`
+- `data/processed/model_comparison.svg`
 
 ### Run tests
 
@@ -84,6 +95,7 @@ Use these files first when understanding or extending the project:
 - `src/aidetect/data.py`: dataset loading and train/test split logic
 - `src/aidetect/features.py`: TF-IDF implementation
 - `src/aidetect/model.py`: logistic regression implementation
+- `src/aidetect/paraphrase.py`: paraphrase generation logic
 - `src/aidetect/metrics.py`: metric computation and SVG figure generation
 
 ## Dataset Format
@@ -118,11 +130,11 @@ Columns:
 - `paraphrase_level`
 - `text`
 
-The current seed dataset is intentionally small and is meant to support reproducible baseline development. It is not the final experimental dataset.
+The raw dataset is still a course-project seed dataset rather than a final large benchmark, but it is larger than the initial checkpoint version and now supports broader evaluation.
 
 ## Expected Baseline Behavior
 
-At the current stage, the baseline should produce measurable performance degradation on paraphrased AI text relative to clean AI text. The existing generated metrics show that the paraphrased split is harder for the model than the clean split.
+At the current stage, the TF-IDF baseline should generally perform strongly on clean text and degrade on at least the stronger paraphrase levels. The neural comparison model provides a second reference point for robustness comparisons.
 
 This behavior is expected and aligns with the project hypothesis.
 
@@ -133,6 +145,8 @@ Implemented now:
 - repository structure
 - seed datasets
 - baseline classifier
+- neural comparison classifier
+- multi-level paraphrase generation
 - evaluation pipeline
 - metrics export
 - simple visualization outputs
@@ -141,7 +155,6 @@ Implemented now:
 Planned but not yet implemented:
 
 - transformer-based model fine-tuning
-- multi-level paraphrasing experiments
 - larger real-world datasets
 - advanced error analysis
 - feature attribution experiments

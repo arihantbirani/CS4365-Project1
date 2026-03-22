@@ -1,103 +1,205 @@
-"""Experiment pipeline for the Week 4 baseline."""
+"""Experiment pipelines for Week 4-6 deliverables."""
 
 from __future__ import annotations
 
 import json
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 
 from .config import (
+    DEFAULT_COMPARISON_PATH,
     DEFAULT_CONFUSION_MATRIX_PATH,
     DEFAULT_METRICS_PATH,
+    DEFAULT_MODEL_COMPARISON_PLOT_PATH,
     DEFAULT_MODEL_PATH,
     DEFAULT_PREDICTIONS_PATH,
+    PARAPHRASE_LEVELS,
     PROCESSED_DIR,
 )
-from .data import build_experiment_data
+from .data import EvaluationSplit, build_experiment_data
 from .features import TfidfVectorizer
-from .metrics import compute_binary_metrics, save_confusion_matrix_figure
-from .model import LogisticRegressionGD
+from .metrics import compute_binary_metrics, save_comparison_plot, save_confusion_matrix_figure
+from .model import EmbeddingAveragingClassifier, LogisticRegressionGD
 
 
-def run_baseline_experiment() -> dict:
+def _evaluate_feature_model(
+    model_name: str,
+    vectorizer: TfidfVectorizer,
+    classifier: LogisticRegressionGD,
+    train_texts: List[str],
+    train_labels: List[int],
+    eval_splits: List[EvaluationSplit],
+) -> tuple[dict, list[dict], dict]:
+    x_train = vectorizer.transform(train_texts)
+    classifier.fit(x_train, np.array(train_labels, dtype=float))
+
+    metrics_payload: Dict[str, dict] = {}
+    prediction_rows: list[dict] = []
+    confusion_matrix = None
+
+    for split in eval_splits:
+        features = vectorizer.transform(split.texts)
+        probs = classifier.predict_proba(features)
+        preds = classifier.predict(features)
+        metrics = compute_binary_metrics(np.array(split.labels), preds).to_dict()
+        metrics_payload[split.name] = metrics
+        if split.name == "clean":
+            confusion_matrix = metrics["confusion_matrix"]
+        for sample_id, label, pred, prob in zip(split.sample_ids, split.labels, preds.tolist(), probs.tolist()):
+            prediction_rows.append(
+                {
+                    "model": model_name,
+                    "split": split.name,
+                    "sample_id": sample_id,
+                    "true_label": label,
+                    "predicted_label": pred,
+                    "predicted_probability_ai": round(prob, 4),
+                }
+            )
+
+    return metrics_payload, prediction_rows, classifier.to_dict()
+
+
+def _evaluate_neural_model(
+    model_name: str,
+    classifier: EmbeddingAveragingClassifier,
+    train_texts: List[str],
+    train_labels: List[int],
+    eval_splits: List[EvaluationSplit],
+) -> tuple[dict, list[dict], dict]:
+    classifier.fit(train_texts, train_labels)
+
+    metrics_payload: Dict[str, dict] = {}
+    prediction_rows: list[dict] = []
+    for split in eval_splits:
+        probs = classifier.predict_proba(split.texts)
+        preds = classifier.predict(split.texts)
+        metrics = compute_binary_metrics(np.array(split.labels), preds).to_dict()
+        metrics_payload[split.name] = metrics
+        for sample_id, label, pred, prob in zip(split.sample_ids, split.labels, preds.tolist(), probs.tolist()):
+            prediction_rows.append(
+                {
+                    "model": model_name,
+                    "split": split.name,
+                    "sample_id": sample_id,
+                    "true_label": label,
+                    "predicted_label": pred,
+                    "predicted_probability_ai": round(prob, 4),
+                }
+            )
+
+    return metrics_payload, prediction_rows, classifier.to_dict()
+
+
+def _attach_degradation(metrics_payload: dict) -> dict:
+    clean_metrics = metrics_payload["clean"]
+    degradation = {}
+    for level in PARAPHRASE_LEVELS:
+        split_metrics = metrics_payload[level]
+        degradation[level] = {
+            "accuracy_drop": round(clean_metrics["accuracy"] - split_metrics["accuracy"], 4),
+            "f1_drop": round(clean_metrics["f1"] - split_metrics["f1"], 4),
+            "recall_drop": round(clean_metrics["recall"] - split_metrics["recall"], 4),
+        }
+    metrics_payload["degradation"] = degradation
+    return metrics_payload
+
+
+def run_full_experiment() -> dict:
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     experiment = build_experiment_data()
+    eval_splits = [experiment.clean_test] + [experiment.paraphrased_tests[level] for level in PARAPHRASE_LEVELS]
 
-    vectorizer = TfidfVectorizer.fit(experiment.train_texts, min_df=1)
-    x_train = vectorizer.transform(experiment.train_texts)
-    y_train = np.array(experiment.train_labels, dtype=float)
-
-    model = LogisticRegressionGD()
-    model.fit(x_train, y_train)
-
-    x_clean = vectorizer.transform(experiment.clean_test_texts)
-    clean_probs = model.predict_proba(x_clean)
-    clean_preds = model.predict(x_clean)
-    clean_metrics = compute_binary_metrics(np.array(experiment.clean_test_labels), clean_preds)
-
-    x_paraphrased = vectorizer.transform(experiment.paraphrased_test_texts)
-    paraphrased_probs = model.predict_proba(x_paraphrased)
-    paraphrased_preds = model.predict(x_paraphrased)
-    paraphrased_metrics = compute_binary_metrics(
-        np.array(experiment.paraphrased_test_labels), paraphrased_preds
+    baseline_metrics, baseline_predictions, baseline_model = _evaluate_feature_model(
+        model_name="tfidf_logreg",
+        vectorizer=TfidfVectorizer.fit(experiment.train_texts, min_df=1),
+        classifier=LogisticRegressionGD(),
+        train_texts=experiment.train_texts,
+        train_labels=experiment.train_labels,
+        eval_splits=eval_splits,
     )
 
-    metrics_payload = {
-        "train_size": len(experiment.train_texts),
-        "clean_test_size": len(experiment.clean_test_texts),
-        "paraphrased_test_size": len(experiment.paraphrased_test_texts),
-        "clean": clean_metrics.to_dict(),
-        "paraphrased": paraphrased_metrics.to_dict(),
-        "degradation": {
-            "accuracy_drop": round(clean_metrics.accuracy - paraphrased_metrics.accuracy, 4),
-            "f1_drop": round(clean_metrics.f1 - paraphrased_metrics.f1, 4),
-            "recall_drop": round(clean_metrics.recall - paraphrased_metrics.recall, 4),
+    neural_metrics, neural_predictions, neural_model = _evaluate_neural_model(
+        model_name="embedding_avg_nn",
+        classifier=EmbeddingAveragingClassifier(),
+        train_texts=experiment.train_texts,
+        train_labels=experiment.train_labels,
+        eval_splits=eval_splits,
+    )
+
+    baseline_metrics = _attach_degradation(baseline_metrics)
+    neural_metrics = _attach_degradation(neural_metrics)
+
+    payload = {
+        "dataset_sizes": {
+            "train_size": len(experiment.train_texts),
+            "clean_test_size": len(experiment.clean_test.texts),
+            **{f"{level}_test_size": len(experiment.paraphrased_tests[level].texts) for level in PARAPHRASE_LEVELS},
+        },
+        "models": {
+            "tfidf_logreg": baseline_metrics,
+            "embedding_avg_nn": neural_metrics,
         },
     }
 
     with DEFAULT_METRICS_PATH.open("w", encoding="utf-8") as handle:
-        json.dump(metrics_payload, handle, indent=2)
+        json.dump(payload, handle, indent=2)
 
     with DEFAULT_MODEL_PATH.open("w", encoding="utf-8") as handle:
         json.dump(
             {
-                "vectorizer": vectorizer.to_dict(),
-                "classifier": model.to_dict(),
+                "tfidf_logreg": baseline_model,
+                "embedding_avg_nn": neural_model,
             },
             handle,
             indent=2,
         )
 
-    predictions = pd.concat(
-        [
-            pd.DataFrame(
-                {
-                    "split": "clean_test",
-                    "sample_id": experiment.clean_test_ids,
-                    "true_label": experiment.clean_test_labels,
-                    "predicted_label": clean_preds.tolist(),
-                    "predicted_probability_ai": clean_probs.round(4),
-                }
-            ),
-            pd.DataFrame(
-                {
-                    "split": "paraphrased_test",
-                    "sample_id": experiment.paraphrased_test_ids,
-                    "true_label": experiment.paraphrased_test_labels,
-                    "predicted_label": paraphrased_preds.tolist(),
-                    "predicted_probability_ai": paraphrased_probs.round(4),
-                }
-            ),
-        ],
-        ignore_index=True,
-    )
+    predictions = pd.DataFrame(baseline_predictions + neural_predictions)
     predictions.to_csv(DEFAULT_PREDICTIONS_PATH, index=False)
 
+    comparison = {
+        "clean_accuracy": {
+            "tfidf_logreg": baseline_metrics["clean"]["accuracy"],
+            "embedding_avg_nn": neural_metrics["clean"]["accuracy"],
+        },
+        **{
+            f"{level}_accuracy": {
+                "tfidf_logreg": baseline_metrics[level]["accuracy"],
+                "embedding_avg_nn": neural_metrics[level]["accuracy"],
+            }
+            for level in PARAPHRASE_LEVELS
+        },
+    }
+    with DEFAULT_COMPARISON_PATH.open("w", encoding="utf-8") as handle:
+        json.dump(comparison, handle, indent=2)
+
     save_confusion_matrix_figure(
-        clean_metrics.confusion_matrix,
-        title="Clean Test Confusion Matrix",
+        baseline_metrics["clean"]["confusion_matrix"],
+        title="TF-IDF + Logistic Regression (Clean)",
         output_path=str(DEFAULT_CONFUSION_MATRIX_PATH),
     )
+    save_comparison_plot(
+        comparison=comparison,
+        output_path=str(DEFAULT_MODEL_COMPARISON_PLOT_PATH),
+    )
 
-    return metrics_payload
+    return payload
+
+
+def run_baseline_experiment() -> dict:
+    payload = run_full_experiment()
+    baseline_metrics = payload["models"]["tfidf_logreg"]
+    clean = baseline_metrics["clean"]
+    moderate = baseline_metrics["moderate"]
+    return {
+        "train_size": payload["dataset_sizes"]["train_size"],
+        "clean_test_size": payload["dataset_sizes"]["clean_test_size"],
+        "paraphrased_test_size": payload["dataset_sizes"]["moderate_test_size"],
+        "clean": clean,
+        "paraphrased": moderate,
+        "degradation": baseline_metrics["degradation"]["moderate"],
+    }
+

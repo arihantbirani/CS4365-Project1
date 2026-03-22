@@ -72,3 +72,58 @@ def save_confusion_matrix_figure(matrix: List[List[int]], title: str, output_pat
 """
     with open(output_path, "w", encoding="utf-8") as handle:
         handle.write(svg)
+
+
+def save_comparison_plot(comparison: Dict[str, Dict[str, float]], output_path: str) -> None:
+    ordered_keys = ["clean_accuracy", "light_accuracy", "moderate_accuracy", "heavy_accuracy"]
+    labels = ["Clean", "Light", "Moderate", "Heavy"]
+    baseline = [comparison[key]["tfidf_logreg"] for key in ordered_keys]
+    neural = [comparison[key]["embedding_avg_nn"] for key in ordered_keys]
+
+    x_positions = [80, 160, 240, 320]
+    baseline_points = []
+    neural_points = []
+    for x_pos, baseline_value, neural_value in zip(x_positions, baseline, neural):
+        baseline_points.append((x_pos, 210 - baseline_value * 140))
+        neural_points.append((x_pos, 210 - neural_value * 140))
+
+    baseline_line = " ".join(f"{x},{y}" for x, y in baseline_points)
+    neural_line = " ".join(f"{x},{y}" for x, y in neural_points)
+    labels_svg = []
+    for x_pos, label in zip(x_positions, labels):
+        labels_svg.append(
+            f'<text x="{x_pos}" y="232" text-anchor="middle" font-size="12" fill="#24476b">{label}</text>'
+        )
+
+    value_labels = []
+    for x_pos, point, value in zip(x_positions, baseline_points, baseline):
+        value_labels.append(
+            f'<text x="{x_pos}" y="{point[1] - 8}" text-anchor="middle" font-size="11" fill="#2a5c99">{value:.2f}</text>'
+        )
+    for x_pos, point, value in zip(x_positions, neural_points, neural):
+        value_labels.append(
+            f'<text x="{x_pos}" y="{point[1] - 8}" text-anchor="middle" font-size="11" fill="#b56b1d">{value:.2f}</text>'
+        )
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="420" height="270" viewBox="0 0 420 270">
+<rect width="420" height="270" fill="#ffffff" />
+<text x="210" y="28" text-anchor="middle" font-size="18" fill="#10263b">Model Accuracy Across Paraphrase Levels</text>
+<line x1="50" y1="50" x2="50" y2="210" stroke="#24476b" />
+<line x1="50" y1="210" x2="370" y2="210" stroke="#24476b" />
+<text x="38" y="214" text-anchor="end" font-size="11" fill="#24476b">0.0</text>
+<text x="38" y="144" text-anchor="end" font-size="11" fill="#24476b">0.5</text>
+<text x="38" y="74" text-anchor="end" font-size="11" fill="#24476b">1.0</text>
+<polyline points="{baseline_line}" fill="none" stroke="#2a5c99" stroke-width="3" />
+<polyline points="{neural_line}" fill="none" stroke="#b56b1d" stroke-width="3" />
+{''.join(f'<circle cx="{x}" cy="{y}" r="4" fill="#2a5c99" />' for x, y in baseline_points)}
+{''.join(f'<circle cx="{x}" cy="{y}" r="4" fill="#b56b1d" />' for x, y in neural_points)}
+{''.join(labels_svg)}
+{''.join(value_labels)}
+<rect x="250" y="42" width="14" height="14" fill="#2a5c99" />
+<text x="270" y="54" font-size="12" fill="#24476b">TF-IDF + Logistic Regression</text>
+<rect x="250" y="62" width="14" height="14" fill="#b56b1d" />
+<text x="270" y="74" font-size="12" fill="#24476b">Embedding Averaging Neural Model</text>
+</svg>
+"""
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write(svg)

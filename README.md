@@ -23,12 +23,14 @@ This project evaluates the robustness of supervised AI detection models against 
 
 ## Current Implementation Status
 
-The repository now includes the Week 3-4 deliverables:
+The repository now includes the Week 3-6 deliverables:
 
-- Seed datasets for human-written text, AI-generated text, and paraphrased AI text.
-- A reproducible baseline pipeline using TF-IDF features and logistic regression.
-- Automatic evaluation on both clean and paraphrased test splits.
-- Exported metrics, predictions, and a confusion matrix figure in `data/processed/`.
+- Expanded human-written and AI-generated seed datasets for a larger evaluation set.
+- A reproducible TF-IDF + logistic regression baseline.
+- A stronger comparison model based on trainable averaged token embeddings.
+- A deterministic paraphrase generator with `light`, `moderate`, and `heavy` levels.
+- Automatic evaluation on clean and multi-level paraphrased test splits.
+- Exported metrics, predictions, and model-comparison figures in `data/processed/`.
 
 ## Dataset Layout
 
@@ -36,20 +38,30 @@ The repository now includes the Week 3-4 deliverables:
 - `data/raw/ai_texts.csv`: AI-generated counterparts for the same domains.
 - `data/paraphrased/ai_texts_paraphrased.csv`: Paraphrased AI samples used for robustness evaluation.
 
-## Running The Baseline
+## Running The Experiment
 
 Run the full experiment from the repository root:
 
 ```bash
-PYTHONPATH=src python3 -m aidetect.cli
+PYTHONPATH=src python3 -m aidetect.cli run
 ```
 
-This command trains the baseline model and writes:
+This command trains both models and writes:
 
 - `data/processed/baseline_metrics.json`
 - `data/processed/baseline_model.json`
 - `data/processed/baseline_predictions.csv`
 - `data/processed/baseline_confusion_matrix.svg`
+- `data/processed/model_comparison.json`
+- `data/processed/model_comparison.svg`
+
+## Generating Paraphrases
+
+To regenerate the paraphrased dataset from the raw AI-written source data:
+
+```bash
+PYTHONPATH=src python3 -m aidetect.cli generate-paraphrases
+```
 
 ## Running Tests
 
@@ -57,13 +69,11 @@ This command trains the baseline model and writes:
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
-## Baseline Method
+## Method Summary
 
-The current baseline is intentionally lightweight so the project can run without downloading external ML packages:
+The current project now supports two models:
 
-1. Training text is vectorized with a custom unigram TF-IDF implementation.
-2. A binary logistic regression classifier is trained with batch gradient descent in `numpy`.
-3. The model is evaluated on a clean test split and on a paraphrased AI test split.
-4. Robustness degradation is reported as the drop in accuracy, recall, and F1 between the two conditions.
+1. A TF-IDF + logistic regression baseline.
+2. A lightweight neural text model that learns token embeddings and averages them for classification.
 
-This gives you a working experimental foundation for later weeks, where you can swap in stronger models and richer paraphrasing strategies.
+The project also includes a rule-based paraphrasing pipeline that produces `light`, `moderate`, and `heavy` paraphrase levels from the AI-written source data. This enables direct robustness comparison across multiple perturbation strengths.
