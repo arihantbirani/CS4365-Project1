@@ -1,0 +1,62 @@
+{
+  "tfidf_logreg": {
+    "clean_accuracy": 0.9167,
+    "clean_f1": 0.9231,
+    "levels": {
+      "light": {
+        "accuracy": 0.9167,
+        "f1": 0.9231,
+        "recall": 1.0,
+        "accuracy_drop": 0.0,
+        "f1_drop": 0.0,
+        "recall_drop": 0.0
+      },
+      "moderate": {
+        "accuracy": 0.75,
+        "f1": 0.7273,
+        "recall": 0.6667,
+        "accuracy_drop": 0.1667,
+        "f1_drop": 0.1958,
+        "recall_drop": 0.3333
+      },
+      "heavy": {
+        "accuracy": 0.75,
+        "f1": 0.7273,
+        "recall": 0.6667,
+        "accuracy_drop": 0.1667,
+        "f1_drop": 0.1958,
+        "recall_drop": 0.3333
+      }
+    }
+  },
+  "embedding_avg_nn": {
+    "clean_accuracy": 0.75,
+    "clean_f1": 0.7692,
+    "levels": {
+      "light": {
+        "accuracy": 0.8333,
+        "f1": 0.8571,
+        "recall": 1.0,
+        "accuracy_drop": -0.0833,
+        "f1_drop": -0.0879,
+        "recall_drop": -0.1667
+      },
+      "moderate": {
+        "accuracy": 0.6667,
+        "f1": 0.6667,
+        "recall": 0.6667,
+        "accuracy_drop": 0.0833,
+        "f1_drop": 0.1025,
+        "recall_drop": 0.1666
+      },
+      "heavy": {
+        "accuracy": 0.75,
+        "f1": 0.7692,
+        "recall": 0.8333,
+        "accuracy_drop": 0.0,
+        "f1_drop": 0.0,
+        "recall_drop": 0.0
+      }
+    }
+  }
+}

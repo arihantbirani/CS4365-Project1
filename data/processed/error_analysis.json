@@ -1,0 +1,162 @@
+{
+  "summary": {
+    "embedding_avg_nn": {
+      "total_paraphrased_rows": 36,
+      "flip_count": 2,
+      "new_error_count": 1,
+      "ai_false_negative_count": 3,
+      "human_false_positive_count": 6,
+      "per_level": {
+        "light": {
+          "flip_count": 1,
+          "new_error_count": 0,
+          "ai_false_negatives": 0,
+          "human_false_positives": 2
+        },
+        "moderate": {
+          "flip_count": 1,
+          "new_error_count": 1,
+          "ai_false_negatives": 2,
+          "human_false_positives": 2
+        },
+        "heavy": {
+          "flip_count": 0,
+          "new_error_count": 0,
+          "ai_false_negatives": 1,
+          "human_false_positives": 2
+        }
+      }
+    },
+    "tfidf_logreg": {
+      "total_paraphrased_rows": 36,
+      "flip_count": 4,
+      "new_error_count": 4,
+      "ai_false_negative_count": 4,
+      "human_false_positive_count": 3,
+      "per_level": {
+        "light": {
+          "flip_count": 0,
+          "new_error_count": 0,
+          "ai_false_negatives": 0,
+          "human_false_positives": 1
+        },
+        "moderate": {
+          "flip_count": 2,
+          "new_error_count": 2,
+          "ai_false_negatives": 2,
+          "human_false_positives": 1
+        },
+        "heavy": {
+          "flip_count": 2,
+          "new_error_count": 2,
+          "ai_false_negatives": 2,
+          "human_false_positives": 1
+        }
+      }
+    }
+  },
+  "notable_cases": {
+    "embedding_avg_nn": {
+      "ai_false_negatives": [
+        {
+          "split": "heavy",
+          "sample_id": "ai_24",
+          "predicted_probability_ai": 0.4999,
+          "clean_probability_ai": 0.5
+        },
+        {
+          "split": "moderate",
+          "sample_id": "ai_24",
+          "predicted_probability_ai": 0.4998,
+          "clean_probability_ai": 0.5
+        },
+        {
+          "split": "moderate",
+          "sample_id": "ai_23",
+          "predicted_probability_ai": 0.5,
+          "clean_probability_ai": 0.5003
+        }
+      ],
+      "human_false_positives": [
+        {
+          "split": "heavy",
+          "sample_id": "human_22",
+          "predicted_probability_ai": 0.5005,
+          "clean_probability_ai": 0.5005
+        },
+        {
+          "split": "heavy",
+          "sample_id": "human_20",
+          "predicted_probability_ai": 0.5,
+          "clean_probability_ai": 0.5
+        },
+        {
+          "split": "light",
+          "sample_id": "human_22",
+          "predicted_probability_ai": 0.5005,
+          "clean_probability_ai": 0.5005
+        },
+        {
+          "split": "light",
+          "sample_id": "human_20",
+          "predicted_probability_ai": 0.5,
+          "clean_probability_ai": 0.5
+        },
+        {
+          "split": "moderate",
+          "sample_id": "human_22",
+          "predicted_probability_ai": 0.5005,
+          "clean_probability_ai": 0.5005
+        }
+      ]
+    },
+    "tfidf_logreg": {
+      "ai_false_negatives": [
+        {
+          "split": "heavy",
+          "sample_id": "ai_19",
+          "predicted_probability_ai": 0.4607,
+          "clean_probability_ai": 0.573
+        },
+        {
+          "split": "heavy",
+          "sample_id": "ai_22",
+          "predicted_probability_ai": 0.4989,
+          "clean_probability_ai": 0.5799
+        },
+        {
+          "split": "moderate",
+          "sample_id": "ai_19",
+          "predicted_probability_ai": 0.4704,
+          "clean_probability_ai": 0.573
+        },
+        {
+          "split": "moderate",
+          "sample_id": "ai_22",
+          "predicted_probability_ai": 0.4954,
+          "clean_probability_ai": 0.5799
+        }
+      ],
+      "human_false_positives": [
+        {
+          "split": "heavy",
+          "sample_id": "human_24",
+          "predicted_probability_ai": 0.5387,
+          "clean_probability_ai": 0.5387
+        },
+        {
+          "split": "light",
+          "sample_id": "human_24",
+          "predicted_probability_ai": 0.5387,
+          "clean_probability_ai": 0.5387
+        },
+        {
+          "split": "moderate",
+          "sample_id": "human_24",
+          "predicted_probability_ai": 0.5387,
+          "clean_probability_ai": 0.5387
+        }
+      ]
+    }
+  }
+}

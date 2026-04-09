@@ -127,3 +127,99 @@ def save_comparison_plot(comparison: Dict[str, Dict[str, float]], output_path: s
 """
     with open(output_path, "w", encoding="utf-8") as handle:
         handle.write(svg)
+
+
+def save_degradation_plot(degradation_summary: Dict[str, dict], output_path: str) -> None:
+    levels = ["light", "moderate", "heavy"]
+    models = list(degradation_summary.keys())
+    width = 560
+    height = 310
+    chart_top = 60
+    chart_bottom = 250
+    group_centers = [130, 280, 430]
+    bar_width = 24
+    model_offsets = [-18, 18]
+    colors = ["#2a5c99", "#b56b1d"]
+    max_drop = 0.4
+
+    bars = []
+    labels = []
+    for model_index, model_name in enumerate(models):
+        for level_index, level in enumerate(levels):
+            drop = degradation_summary[model_name]["levels"][level]["f1_drop"]
+            x = group_centers[level_index] + model_offsets[model_index] - bar_width / 2
+            bar_height = max(0.0, drop) / max_drop * (chart_bottom - chart_top)
+            y = chart_bottom - bar_height
+            bars.append(
+                f'<rect x="{x}" y="{y}" width="{bar_width}" height="{bar_height}" fill="{colors[model_index]}" />'
+            )
+            labels.append(
+                f'<text x="{x + bar_width / 2}" y="{y - 8}" text-anchor="middle" font-size="11" fill="#10263b">{drop:.2f}</text>'
+            )
+
+    level_labels = "".join(
+        f'<text x="{center}" y="272" text-anchor="middle" font-size="12" fill="#24476b">{level.title()}</text>'
+        for center, level in zip(group_centers, levels)
+    )
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+<rect width="{width}" height="{height}" fill="#ffffff" />
+<text x="{width / 2}" y="28" text-anchor="middle" font-size="18" fill="#10263b">F1 Degradation Under Paraphrasing</text>
+<line x1="70" y1="{chart_top}" x2="70" y2="{chart_bottom}" stroke="#24476b" />
+<line x1="70" y1="{chart_bottom}" x2="510" y2="{chart_bottom}" stroke="#24476b" />
+<text x="58" y="{chart_bottom + 4}" text-anchor="end" font-size="11" fill="#24476b">0.00</text>
+<text x="58" y="{chart_bottom - 47}" text-anchor="end" font-size="11" fill="#24476b">0.10</text>
+<text x="58" y="{chart_bottom - 94}" text-anchor="end" font-size="11" fill="#24476b">0.20</text>
+<text x="58" y="{chart_bottom - 141}" text-anchor="end" font-size="11" fill="#24476b">0.30</text>
+<text x="58" y="{chart_top + 4}" text-anchor="end" font-size="11" fill="#24476b">0.40</text>
+{''.join(bars)}
+{''.join(labels)}
+{level_labels}
+<rect x="350" y="42" width="14" height="14" fill="{colors[0]}" />
+<text x="370" y="54" font-size="12" fill="#24476b">TF-IDF + Logistic Regression</text>
+<rect x="350" y="62" width="14" height="14" fill="{colors[1]}" />
+<text x="370" y="74" font-size="12" fill="#24476b">Embedding Averaging Neural Model</text>
+</svg>
+"""
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write(svg)
+
+
+def save_confusion_matrix_grid(model_metrics: Dict[str, dict], output_path: str) -> None:
+    splits = ["clean", "light", "moderate", "heavy"]
+    colors = ["#dce8f5", "#8fb6df", "#8fb6df", "#4c84c3"]
+    cells = []
+    panel_width = 180
+    panel_height = 180
+
+    for index, split in enumerate(splits):
+        base_x = 20 + index * 190
+        base_y = 70
+        matrix = model_metrics[split]["confusion_matrix"]
+        cells.append(f'<text x="{base_x + 75}" y="50" text-anchor="middle" font-size="14" fill="#10263b">{split.title()}</text>')
+        coords = [(base_x, base_y), (base_x + 70, base_y), (base_x, base_y + 70), (base_x + 70, base_y + 70)]
+        values = [matrix[0][0], matrix[0][1], matrix[1][0], matrix[1][1]]
+        for color, (x_pos, y_pos), value in zip(colors, coords, values):
+            cells.append(
+                f'<rect x="{x_pos}" y="{y_pos}" width="68" height="68" fill="{color}" stroke="#24476b" />'
+            )
+            cells.append(
+                f'<text x="{x_pos + 34}" y="{y_pos + 38}" text-anchor="middle" font-size="18" fill="#10263b">{value}</text>'
+            )
+        cells.append(f'<text x="{base_x + 34}" y="{base_y - 6}" text-anchor="middle" font-size="10" fill="#24476b">Pred H</text>')
+        cells.append(f'<text x="{base_x + 104}" y="{base_y - 6}" text-anchor="middle" font-size="10" fill="#24476b">Pred A</text>')
+        cells.append(
+            f'<text x="{base_x - 8}" y="{base_y + 34}" text-anchor="end" font-size="10" fill="#24476b">True H</text>'
+        )
+        cells.append(
+            f'<text x="{base_x - 8}" y="{base_y + 104}" text-anchor="end" font-size="10" fill="#24476b">True A</text>'
+        )
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="800" height="270" viewBox="0 0 800 270">
+<rect width="800" height="270" fill="#ffffff" />
+<text x="400" y="28" text-anchor="middle" font-size="18" fill="#10263b">TF-IDF Confusion Matrices Across Splits</text>
+{''.join(cells)}
+</svg>
+"""
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write(svg)

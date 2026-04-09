@@ -1,0 +1,177 @@
+{
+  "dataset_sizes": {
+    "train_size": 36,
+    "clean_test_size": 12,
+    "light_test_size": 12,
+    "moderate_test_size": 12,
+    "heavy_test_size": 12
+  },
+  "models": {
+    "tfidf_logreg": {
+      "clean": {
+        "accuracy": 0.9167,
+        "precision": 0.8571,
+        "recall": 1.0,
+        "f1": 0.9231,
+        "confusion_matrix": [
+          [
+            5,
+            1
+          ],
+          [
+            0,
+            6
+          ]
+        ]
+      },
+      "light": {
+        "accuracy": 0.9167,
+        "precision": 0.8571,
+        "recall": 1.0,
+        "f1": 0.9231,
+        "confusion_matrix": [
+          [
+            5,
+            1
+          ],
+          [
+            0,
+            6
+          ]
+        ]
+      },
+      "moderate": {
+        "accuracy": 0.75,
+        "precision": 0.8,
+        "recall": 0.6667,
+        "f1": 0.7273,
+        "confusion_matrix": [
+          [
+            5,
+            1
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+      },
+      "heavy": {
+        "accuracy": 0.75,
+        "precision": 0.8,
+        "recall": 0.6667,
+        "f1": 0.7273,
+        "confusion_matrix": [
+          [
+            5,
+            1
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+      },
+      "degradation": {
+        "light": {
+          "accuracy_drop": 0.0,
+          "f1_drop": 0.0,
+          "recall_drop": 0.0
+        },
+        "moderate": {
+          "accuracy_drop": 0.1667,
+          "f1_drop": 0.1958,
+          "recall_drop": 0.3333
+        },
+        "heavy": {
+          "accuracy_drop": 0.1667,
+          "f1_drop": 0.1958,
+          "recall_drop": 0.3333
+        }
+      }
+    },
+    "embedding_avg_nn": {
+      "clean": {
+        "accuracy": 0.75,
+        "precision": 0.7143,
+        "recall": 0.8333,
+        "f1": 0.7692,
+        "confusion_matrix": [
+          [
+            4,
+            2
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      },
+      "light": {
+        "accuracy": 0.8333,
+        "precision": 0.75,
+        "recall": 1.0,
+        "f1": 0.8571,
+        "confusion_matrix": [
+          [
+            4,
+            2
+          ],
+          [
+            0,
+            6
+          ]
+        ]
+      },
+      "moderate": {
+        "accuracy": 0.6667,
+        "precision": 0.6667,
+        "recall": 0.6667,
+        "f1": 0.6667,
+        "confusion_matrix": [
+          [
+            4,
+            2
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+      },
+      "heavy": {
+        "accuracy": 0.75,
+        "precision": 0.7143,
+        "recall": 0.8333,
+        "f1": 0.7692,
+        "confusion_matrix": [
+          [
+            4,
+            2
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      },
+      "degradation": {
+        "light": {
+          "accuracy_drop": -0.0833,
+          "f1_drop": -0.0879,
+          "recall_drop": -0.1667
+        },
+        "moderate": {
+          "accuracy_drop": 0.0833,
+          "f1_drop": 0.1025,
+          "recall_drop": 0.1666
+        },
+        "heavy": {
+          "accuracy_drop": 0.0,
+          "f1_drop": 0.0,
+          "recall_drop": 0.0
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-"""Experiment pipelines for Week 4-6 deliverables."""
+"""Experiment pipelines for Week 4-8 deliverables."""
 
 from __future__ import annotations
 
@@ -8,9 +8,15 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
+from .analysis import build_degradation_summary, build_error_analysis
 from .config import (
     DEFAULT_COMPARISON_PATH,
     DEFAULT_CONFUSION_MATRIX_PATH,
+    DEFAULT_CONFUSION_GRID_PATH,
+    DEFAULT_DEGRADATION_PATH,
+    DEFAULT_DEGRADATION_PLOT_PATH,
+    DEFAULT_ERROR_ANALYSIS_PATH,
+    DEFAULT_ERROR_CASES_PATH,
     DEFAULT_METRICS_PATH,
     DEFAULT_MODEL_COMPARISON_PLOT_PATH,
     DEFAULT_MODEL_PATH,
@@ -20,7 +26,13 @@ from .config import (
 )
 from .data import EvaluationSplit, build_experiment_data
 from .features import TfidfVectorizer
-from .metrics import compute_binary_metrics, save_comparison_plot, save_confusion_matrix_figure
+from .metrics import (
+    compute_binary_metrics,
+    save_comparison_plot,
+    save_confusion_matrix_figure,
+    save_confusion_matrix_grid,
+    save_degradation_plot,
+)
 from .model import EmbeddingAveragingClassifier, LogisticRegressionGD
 
 
@@ -176,6 +188,15 @@ def run_full_experiment() -> dict:
     with DEFAULT_COMPARISON_PATH.open("w", encoding="utf-8") as handle:
         json.dump(comparison, handle, indent=2)
 
+    degradation_summary = build_degradation_summary(payload)
+    with DEFAULT_DEGRADATION_PATH.open("w", encoding="utf-8") as handle:
+        json.dump(degradation_summary, handle, indent=2)
+
+    error_analysis, error_cases = build_error_analysis(predictions)
+    with DEFAULT_ERROR_ANALYSIS_PATH.open("w", encoding="utf-8") as handle:
+        json.dump(error_analysis, handle, indent=2)
+    error_cases.to_csv(DEFAULT_ERROR_CASES_PATH, index=False)
+
     save_confusion_matrix_figure(
         baseline_metrics["clean"]["confusion_matrix"],
         title="TF-IDF + Logistic Regression (Clean)",
@@ -184,6 +205,14 @@ def run_full_experiment() -> dict:
     save_comparison_plot(
         comparison=comparison,
         output_path=str(DEFAULT_MODEL_COMPARISON_PLOT_PATH),
+    )
+    save_degradation_plot(
+        degradation_summary=degradation_summary,
+        output_path=str(DEFAULT_DEGRADATION_PLOT_PATH),
+    )
+    save_confusion_matrix_grid(
+        model_metrics=baseline_metrics,
+        output_path=str(DEFAULT_CONFUSION_GRID_PATH),
     )
 
     return payload
@@ -202,4 +231,3 @@ def run_baseline_experiment() -> dict:
         "paraphrased": moderate,
         "degradation": baseline_metrics["degradation"]["moderate"],
     }
-

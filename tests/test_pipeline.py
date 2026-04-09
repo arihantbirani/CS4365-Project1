@@ -40,6 +40,7 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("models", metrics)
         self.assertIn("tfidf_logreg", metrics["models"])
         self.assertIn("embedding_avg_nn", metrics["models"])
+        self.assertIn("degradation", metrics["models"]["tfidf_logreg"])
 
 
 if __name__ == "__main__":

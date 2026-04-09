@@ -23,14 +23,14 @@ This project evaluates the robustness of supervised AI detection models against 
 
 ## Current Implementation Status
 
-The repository now includes the Week 3-6 deliverables:
+The repository now includes the Week 3-8 deliverables:
 
 - Expanded human-written and AI-generated seed datasets for a larger evaluation set.
 - A reproducible TF-IDF + logistic regression baseline.
 - A stronger comparison model based on trainable averaged token embeddings.
 - A deterministic paraphrase generator with `light`, `moderate`, and `heavy` levels.
 - Automatic evaluation on clean and multi-level paraphrased test splits.
-- Exported metrics, predictions, and model-comparison figures in `data/processed/`.
+- Exported metrics, predictions, degradation summaries, confusion matrices, and error-analysis artifacts in `data/processed/`.
 
 ## Dataset Layout
 
@@ -54,6 +54,11 @@ This command trains both models and writes:
 - `data/processed/baseline_confusion_matrix.svg`
 - `data/processed/model_comparison.json`
 - `data/processed/model_comparison.svg`
+- `data/processed/degradation_summary.json`
+- `data/processed/degradation_summary.svg`
+- `data/processed/error_analysis.json`
+- `data/processed/error_cases.csv`
+- `data/processed/confusion_matrix_grid.svg`
 
 ## Generating Paraphrases
 
@@ -77,3 +82,18 @@ The current project now supports two models:
 2. A lightweight neural text model that learns token embeddings and averages them for classification.
 
 The project also includes a rule-based paraphrasing pipeline that produces `light`, `moderate`, and `heavy` paraphrase levels from the AI-written source data. This enables direct robustness comparison across multiple perturbation strengths.
+
+## Week 7-8 Analysis Outputs
+
+The newer analysis layer supports two additional tasks from the milestone chart:
+
+1. Measuring performance degradation under paraphrasing with explicit per-model drop summaries.
+2. Comparing models under different paraphrase strengths while exporting concrete error cases for inspection.
+
+The main analysis artifacts are:
+
+- `data/processed/degradation_summary.json`
+- `data/processed/degradation_summary.svg`
+- `data/processed/error_analysis.json`
+- `data/processed/error_cases.csv`
+- `data/processed/confusion_matrix_grid.svg`

@@ -1,0 +1,18 @@
+{
+  "clean_accuracy": {
+    "tfidf_logreg": 0.9167,
+    "embedding_avg_nn": 0.75
+  },
+  "light_accuracy": {
+    "tfidf_logreg": 0.9167,
+    "embedding_avg_nn": 0.8333
+  },
+  "moderate_accuracy": {
+    "tfidf_logreg": 0.75,
+    "embedding_avg_nn": 0.6667
+  },
+  "heavy_accuracy": {
+    "tfidf_logreg": 0.75,
+    "embedding_avg_nn": 0.75
+  }
+}

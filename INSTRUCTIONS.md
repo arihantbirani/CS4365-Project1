@@ -4,13 +4,14 @@
 
 This repository contains a CS 4365 project titled **Robust Detection of AI-Generated Text Under Paraphrasing**.
 
-The current implementation covers the Week 3-6 experimental foundation:
+The current implementation covers the Week 3-8 experimental foundation:
 
 - expanded seed datasets for human-written text and AI-generated text
 - a deterministic paraphrase generator with `light`, `moderate`, and `heavy` levels
 - a TF-IDF + logistic regression baseline
 - a stronger neural comparison model based on learned token embeddings
 - an evaluation pipeline that compares clean-text performance against multiple paraphrase levels
+- post-run degradation summaries and error-analysis exports
 - unit tests for the core pipeline components
 
 The main research question is whether supervised AI-text detectors remain reliable when AI-generated text is paraphrased.
@@ -79,6 +80,11 @@ Expected generated files:
 - `data/processed/baseline_confusion_matrix.svg`
 - `data/processed/model_comparison.json`
 - `data/processed/model_comparison.svg`
+- `data/processed/degradation_summary.json`
+- `data/processed/degradation_summary.svg`
+- `data/processed/error_analysis.json`
+- `data/processed/error_cases.csv`
+- `data/processed/confusion_matrix_grid.svg`
 
 ### Run tests
 
@@ -96,6 +102,7 @@ Use these files first when understanding or extending the project:
 - `src/aidetect/features.py`: TF-IDF implementation
 - `src/aidetect/model.py`: logistic regression implementation
 - `src/aidetect/paraphrase.py`: paraphrase generation logic
+- `src/aidetect/analysis.py`: degradation and error-analysis logic
 - `src/aidetect/metrics.py`: metric computation and SVG figure generation
 
 ## Dataset Format
@@ -150,6 +157,8 @@ Implemented now:
 - evaluation pipeline
 - metrics export
 - simple visualization outputs
+- degradation summaries
+- error-case exports
 - unit tests
 
 Planned but not yet implemented:
