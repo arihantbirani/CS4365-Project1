@@ -1,0 +1,74 @@
+{
+  "baseline_logreg": {
+    "best": {
+      "learning_rate": 0.3,
+      "epochs": 250,
+      "l2_strength": 0.0005,
+      "clean_f1": 0.9231,
+      "moderate_f1": 0.7273,
+      "heavy_f1": 0.7273
+    },
+    "trials": [
+      {
+        "learning_rate": 0.3,
+        "epochs": 250,
+        "l2_strength": 0.0005,
+        "clean_f1": 0.9231,
+        "moderate_f1": 0.7273,
+        "heavy_f1": 0.7273
+      },
+      {
+        "learning_rate": 0.5,
+        "epochs": 400,
+        "l2_strength": 0.001,
+        "clean_f1": 0.9231,
+        "moderate_f1": 0.7273,
+        "heavy_f1": 0.7273
+      },
+      {
+        "learning_rate": 0.8,
+        "epochs": 500,
+        "l2_strength": 0.002,
+        "clean_f1": 0.9231,
+        "moderate_f1": 0.7273,
+        "heavy_f1": 0.8333
+      }
+    ]
+  },
+  "embedding_avg_nn": {
+    "best": {
+      "embedding_dim": 24,
+      "learning_rate": 0.08,
+      "epochs": 80,
+      "clean_f1": 0.7692,
+      "moderate_f1": 0.6667,
+      "heavy_f1": 0.7692
+    },
+    "trials": [
+      {
+        "embedding_dim": 16,
+        "learning_rate": 0.06,
+        "epochs": 60,
+        "clean_f1": 0.0,
+        "moderate_f1": 0.0,
+        "heavy_f1": 0.0
+      },
+      {
+        "embedding_dim": 24,
+        "learning_rate": 0.08,
+        "epochs": 80,
+        "clean_f1": 0.7692,
+        "moderate_f1": 0.6667,
+        "heavy_f1": 0.7692
+      },
+      {
+        "embedding_dim": 32,
+        "learning_rate": 0.05,
+        "epochs": 100,
+        "clean_f1": 0.0,
+        "moderate_f1": 0.0,
+        "heavy_f1": 0.0
+      }
+    ]
+  }
+}

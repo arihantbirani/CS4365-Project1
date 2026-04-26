@@ -1,0 +1,126 @@
+{
+  "top_ai_indicators": [
+    {
+      "term": "by",
+      "weight": 1.1536
+    },
+    {
+      "term": "a",
+      "weight": 1.0806
+    },
+    {
+      "term": "experience",
+      "weight": 0.8783
+    },
+    {
+      "term": "with",
+      "weight": 0.869
+    },
+    {
+      "term": "practical",
+      "weight": 0.8174
+    },
+    {
+      "term": "strong",
+      "weight": 0.8008
+    },
+    {
+      "term": "it",
+      "weight": 0.7567
+    },
+    {
+      "term": "making",
+      "weight": 0.7567
+    },
+    {
+      "term": "information",
+      "weight": 0.736
+    },
+    {
+      "term": "dependable",
+      "weight": 0.6839
+    },
+    {
+      "term": "promoting",
+      "weight": 0.682
+    },
+    {
+      "term": "short",
+      "weight": 0.6709
+    },
+    {
+      "term": "efficiency",
+      "weight": 0.6693
+    },
+    {
+      "term": "service",
+      "weight": 0.6631
+    },
+    {
+      "term": "feedback",
+      "weight": 0.6545
+    }
+  ],
+  "top_human_indicators": [
+    {
+      "term": "the",
+      "weight": -2.3518
+    },
+    {
+      "term": "i",
+      "weight": -1.3761
+    },
+    {
+      "term": "but",
+      "weight": -1.3177
+    },
+    {
+      "term": "are",
+      "weight": -1.0948
+    },
+    {
+      "term": "more",
+      "weight": -0.9749
+    },
+    {
+      "term": "space",
+      "weight": -0.9701
+    },
+    {
+      "term": "is",
+      "weight": -0.9453
+    },
+    {
+      "term": "because",
+      "weight": -0.9212
+    },
+    {
+      "term": "enough",
+      "weight": -0.8375
+    },
+    {
+      "term": "in",
+      "weight": -0.8188
+    },
+    {
+      "term": "only",
+      "weight": -0.7892
+    },
+    {
+      "term": "use",
+      "weight": -0.7256
+    },
+    {
+      "term": "how",
+      "weight": -0.6896
+    },
+    {
+      "term": "clearly",
+      "weight": -0.6704
+    },
+    {
+      "term": "than",
+      "weight": -0.6558
+    }
+  ]
+}
