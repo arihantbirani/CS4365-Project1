@@ -1,9 +1,15 @@
 import unittest
+from pathlib import Path
 
 from aidetect.data import build_experiment_data
 from aidetect.features import TfidfVectorizer, tokenize
 from aidetect.paraphrase import paraphrase_text
 from aidetect.pipeline import run_baseline_experiment, run_full_experiment
+from aidetect.config import (
+    DEFAULT_FEATURE_CONTRIBUTIONS_PATH,
+    DEFAULT_FINAL_REPORT_PATH,
+    DEFAULT_OPTIMIZATION_PATH,
+)
 
 
 class PipelineTests(unittest.TestCase):
@@ -41,6 +47,12 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("tfidf_logreg", metrics["models"])
         self.assertIn("embedding_avg_nn", metrics["models"])
         self.assertIn("degradation", metrics["models"]["tfidf_logreg"])
+
+    def test_full_experiment_writes_week_9_and_10_artifacts(self) -> None:
+        run_full_experiment()
+        self.assertTrue(Path(DEFAULT_FEATURE_CONTRIBUTIONS_PATH).exists())
+        self.assertTrue(Path(DEFAULT_OPTIMIZATION_PATH).exists())
+        self.assertTrue(Path(DEFAULT_FINAL_REPORT_PATH).exists())
 
 
 if __name__ == "__main__":

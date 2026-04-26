@@ -4,7 +4,7 @@
 
 This repository contains a CS 4365 project titled **Robust Detection of AI-Generated Text Under Paraphrasing**.
 
-The current implementation covers the Week 3-8 experimental foundation:
+The current implementation covers the Week 3-10 experimental foundation:
 
 - expanded seed datasets for human-written text and AI-generated text
 - a deterministic paraphrase generator with `light`, `moderate`, and `heavy` levels
@@ -12,6 +12,9 @@ The current implementation covers the Week 3-8 experimental foundation:
 - a stronger neural comparison model based on learned token embeddings
 - an evaluation pipeline that compares clean-text performance against multiple paraphrase levels
 - post-run degradation summaries and error-analysis exports
+- feature contribution analysis for the TF-IDF baseline
+- optimization sweeps for both implemented models
+- a generated final report artifact
 - unit tests for the core pipeline components
 
 The main research question is whether supervised AI-text detectors remain reliable when AI-generated text is paraphrased.
@@ -85,6 +88,11 @@ Expected generated files:
 - `data/processed/error_analysis.json`
 - `data/processed/error_cases.csv`
 - `data/processed/confusion_matrix_grid.svg`
+- `data/processed/feature_contributions.json`
+- `data/processed/feature_contributions.csv`
+- `data/processed/feature_contributions.svg`
+- `data/processed/optimization_summary.json`
+- `data/processed/final_report.md`
 
 ### Run tests
 
@@ -165,8 +173,8 @@ Planned but not yet implemented:
 
 - transformer-based model fine-tuning
 - larger real-world datasets
-- advanced error analysis
-- feature attribution experiments
+- deeper attribution beyond linear feature weights
+- more advanced paraphrase generation and augmentation
 
 ## Guidance For Another LLM Agent
 

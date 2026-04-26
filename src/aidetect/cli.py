@@ -13,7 +13,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="AI-generated text detection experiments")
     subparsers = parser.add_subparsers(dest="command")
 
-    subparsers.add_parser("run", help="Run the full Week 4-8 experiment")
+    subparsers.add_parser("run", help="Run the full Week 4-10 experiment")
     subparsers.add_parser("generate-paraphrases", help="Generate the paraphrased dataset from raw AI text")
     return parser
 

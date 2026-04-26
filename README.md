@@ -23,7 +23,7 @@ This project evaluates the robustness of supervised AI detection models against 
 
 ## Current Implementation Status
 
-The repository now includes the Week 3-8 deliverables:
+The repository now includes the Week 3-10 deliverables:
 
 - Expanded human-written and AI-generated seed datasets for a larger evaluation set.
 - A reproducible TF-IDF + logistic regression baseline.
@@ -31,6 +31,9 @@ The repository now includes the Week 3-8 deliverables:
 - A deterministic paraphrase generator with `light`, `moderate`, and `heavy` levels.
 - Automatic evaluation on clean and multi-level paraphrased test splits.
 - Exported metrics, predictions, degradation summaries, confusion matrices, and error-analysis artifacts in `data/processed/`.
+- Baseline feature contribution summaries for lexical cue analysis.
+- Lightweight optimization sweeps for both implemented models.
+- An automatically generated final report artifact for submission support.
 
 ## Dataset Layout
 
@@ -59,6 +62,11 @@ This command trains both models and writes:
 - `data/processed/error_analysis.json`
 - `data/processed/error_cases.csv`
 - `data/processed/confusion_matrix_grid.svg`
+- `data/processed/feature_contributions.json`
+- `data/processed/feature_contributions.csv`
+- `data/processed/feature_contributions.svg`
+- `data/processed/optimization_summary.json`
+- `data/processed/final_report.md`
 
 ## Generating Paraphrases
 
@@ -83,12 +91,15 @@ The current project now supports two models:
 
 The project also includes a rule-based paraphrasing pipeline that produces `light`, `moderate`, and `heavy` paraphrase levels from the AI-written source data. This enables direct robustness comparison across multiple perturbation strengths.
 
-## Week 7-8 Analysis Outputs
+## Week 7-10 Analysis Outputs
 
-The newer analysis layer supports two additional tasks from the milestone chart:
+The newer analysis layer supports the later milestone tasks from the roadmap:
 
 1. Measuring performance degradation under paraphrasing with explicit per-model drop summaries.
 2. Comparing models under different paraphrase strengths while exporting concrete error cases for inspection.
+3. Analyzing baseline lexical feature contributions.
+4. Running lightweight optimization sweeps for both implemented models.
+5. Producing a final Markdown report artifact for the project write-up.
 
 The main analysis artifacts are:
 
@@ -97,3 +108,8 @@ The main analysis artifacts are:
 - `data/processed/error_analysis.json`
 - `data/processed/error_cases.csv`
 - `data/processed/confusion_matrix_grid.svg`
+- `data/processed/feature_contributions.json`
+- `data/processed/feature_contributions.csv`
+- `data/processed/feature_contributions.svg`
+- `data/processed/optimization_summary.json`
+- `data/processed/final_report.md`

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Dict, List
 
 import numpy as np
+import pandas as pd
 
 
 @dataclass
@@ -219,6 +220,57 @@ def save_confusion_matrix_grid(model_metrics: Dict[str, dict], output_path: str)
 <rect width="800" height="270" fill="#ffffff" />
 <text x="400" y="28" text-anchor="middle" font-size="18" fill="#10263b">TF-IDF Confusion Matrices Across Splits</text>
 {''.join(cells)}
+</svg>
+"""
+    with open(output_path, "w", encoding="utf-8") as handle:
+        handle.write(svg)
+
+
+def save_feature_contribution_plot(contribution_rows: pd.DataFrame, output_path: str) -> None:
+    top_ai = contribution_rows[contribution_rows["direction"] == "ai_indicator"].head(8)
+    top_human = contribution_rows[contribution_rows["direction"] == "human_indicator"].head(8)
+
+    width = 720
+    height = 360
+    center_x = width / 2
+    max_abs_weight = max(
+        0.1,
+        float(np.max(np.abs(contribution_rows["weight"].to_numpy(dtype=float))))
+        if not contribution_rows.empty
+        else 0.1,
+    )
+    scale = 220 / max_abs_weight
+
+    bars = []
+    labels = []
+    for index, row in enumerate(reversed(top_human.to_dict(orient="records"))):
+        y = 50 + index * 32
+        width_px = abs(row["weight"]) * scale
+        bars.append(
+            f'<rect x="{center_x - width_px}" y="{y}" width="{width_px}" height="22" fill="#2a5c99" />'
+        )
+        labels.append(
+            f'<text x="{center_x - width_px - 8}" y="{y + 16}" text-anchor="end" font-size="11" fill="#24476b">{row["term"]}</text>'
+        )
+
+    for index, row in enumerate(top_ai.to_dict(orient="records")):
+        y = 50 + index * 32
+        width_px = abs(row["weight"]) * scale
+        bars.append(
+            f'<rect x="{center_x}" y="{y}" width="{width_px}" height="22" fill="#b56b1d" />'
+        )
+        labels.append(
+            f'<text x="{center_x + width_px + 8}" y="{y + 16}" text-anchor="start" font-size="11" fill="#24476b">{row["term"]}</text>'
+        )
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+<rect width="{width}" height="{height}" fill="#ffffff" />
+<text x="{width / 2}" y="26" text-anchor="middle" font-size="18" fill="#10263b">Top Baseline Feature Contributions</text>
+<line x1="{center_x}" y1="40" x2="{center_x}" y2="325" stroke="#24476b" />
+<text x="{center_x - 110}" y="340" text-anchor="middle" font-size="12" fill="#24476b">Human indicators</text>
+<text x="{center_x + 110}" y="340" text-anchor="middle" font-size="12" fill="#24476b">AI indicators</text>
+{''.join(bars)}
+{''.join(labels)}
 </svg>
 """
     with open(output_path, "w", encoding="utf-8") as handle:

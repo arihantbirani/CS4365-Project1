@@ -1,9 +1,10 @@
-"""Post-evaluation analysis for robustness and error behavior."""
+"""Post-evaluation analysis for robustness, feature behavior, and reporting."""
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict
 
+import numpy as np
 import pandas as pd
 
 from .config import PARAPHRASE_LEVELS
@@ -137,3 +138,143 @@ def build_error_analysis(predictions: pd.DataFrame) -> tuple[dict, pd.DataFrame]
 
     return analysis, error_cases
 
+
+def build_feature_contributions(vocabulary: dict[str, int], weights: np.ndarray, top_k: int = 15) -> dict:
+    """Summarize the strongest lexical cues learned by the baseline model."""
+
+    sorted_terms = sorted(vocabulary.items(), key=lambda item: item[1])
+    term_weights = [(term, float(weights[index])) for term, index in sorted_terms]
+    positive = sorted(term_weights, key=lambda item: item[1], reverse=True)[:top_k]
+    negative = sorted(term_weights, key=lambda item: item[1])[:top_k]
+
+    return {
+        "top_ai_indicators": [
+            {"term": term, "weight": round(weight, 4)}
+            for term, weight in positive
+        ],
+        "top_human_indicators": [
+            {"term": term, "weight": round(weight, 4)}
+            for term, weight in negative
+        ],
+    }
+
+
+def build_feature_contribution_rows(contributions: dict) -> pd.DataFrame:
+    rows: list[dict] = []
+    for direction, items in contributions.items():
+        label = "ai_indicator" if direction == "top_ai_indicators" else "human_indicator"
+        for rank, item in enumerate(items, start=1):
+            rows.append(
+                {
+                    "direction": label,
+                    "rank": rank,
+                    "term": item["term"],
+                    "weight": item["weight"],
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def build_optimization_summary(
+    baseline_search: list[dict],
+    neural_search: list[dict],
+) -> dict:
+    """Package Week 9 optimization experiments into one summary object."""
+
+    best_baseline = max(baseline_search, key=lambda row: row["moderate_f1"])
+    best_neural = max(neural_search, key=lambda row: row["moderate_f1"])
+    return {
+        "baseline_logreg": {
+            "best": best_baseline,
+            "trials": baseline_search,
+        },
+        "embedding_avg_nn": {
+            "best": best_neural,
+            "trials": neural_search,
+        },
+    }
+
+
+def build_final_report(
+    metrics_payload: dict,
+    degradation_summary: dict,
+    optimization_summary: dict,
+    feature_contributions: dict,
+    error_analysis: dict,
+) -> str:
+    """Generate a concise final project report artifact for Week 10."""
+
+    dataset_sizes = metrics_payload["dataset_sizes"]
+    baseline_clean = metrics_payload["models"]["tfidf_logreg"]["clean"]
+    neural_clean = metrics_payload["models"]["embedding_avg_nn"]["clean"]
+    baseline_heavy = metrics_payload["models"]["tfidf_logreg"]["heavy"]
+    neural_heavy = metrics_payload["models"]["embedding_avg_nn"]["heavy"]
+
+    lines = [
+        "# Final Report: Robust Detection of AI-Generated Text Under Paraphrasing",
+        "",
+        "## Objective",
+        "Measure how strongly supervised AI-text detectors degrade under paraphrasing and whether simple model choices remain robust.",
+        "",
+        "## Dataset Summary",
+        f"- Train size: {dataset_sizes['train_size']}",
+        f"- Clean test size: {dataset_sizes['clean_test_size']}",
+        f"- Light paraphrase test size: {dataset_sizes['light_test_size']}",
+        f"- Moderate paraphrase test size: {dataset_sizes['moderate_test_size']}",
+        f"- Heavy paraphrase test size: {dataset_sizes['heavy_test_size']}",
+        "",
+        "## Model Results",
+        f"- TF-IDF + Logistic Regression clean accuracy/F1: {baseline_clean['accuracy']:.4f} / {baseline_clean['f1']:.4f}",
+        f"- Embedding Averaging Neural Model clean accuracy/F1: {neural_clean['accuracy']:.4f} / {neural_clean['f1']:.4f}",
+        f"- TF-IDF + Logistic Regression heavy paraphrase accuracy/F1: {baseline_heavy['accuracy']:.4f} / {baseline_heavy['f1']:.4f}",
+        f"- Embedding Averaging Neural Model heavy paraphrase accuracy/F1: {neural_heavy['accuracy']:.4f} / {neural_heavy['f1']:.4f}",
+        "",
+        "## Robustness Findings",
+    ]
+
+    for model_name, summary in degradation_summary.items():
+        heavy = summary["levels"]["heavy"]
+        lines.append(
+            f"- {model_name}: heavy paraphrase accuracy drop {heavy['accuracy_drop']:.4f}, F1 drop {heavy['f1_drop']:.4f}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Feature Contribution Analysis",
+            "- Strong AI-indicator terms:",
+        ]
+    )
+    lines.extend(
+        [f"  - {item['term']} ({item['weight']:.4f})" for item in feature_contributions["top_ai_indicators"][:5]]
+    )
+    lines.append("- Strong human-indicator terms:")
+    lines.extend(
+        [f"  - {item['term']} ({item['weight']:.4f})" for item in feature_contributions["top_human_indicators"][:5]]
+    )
+
+    lines.extend(
+        [
+            "",
+            "## Optimization Summary",
+            f"- Best baseline moderate-F1: {optimization_summary['baseline_logreg']['best']['moderate_f1']:.4f}",
+            f"- Best neural moderate-F1: {optimization_summary['embedding_avg_nn']['best']['moderate_f1']:.4f}",
+            "",
+            "## Error Analysis",
+        ]
+    )
+
+    for model_name, summary in error_analysis["summary"].items():
+        lines.append(
+            f"- {model_name}: {summary['flip_count']} prediction flips from clean to paraphrased text, {summary['new_error_count']} new paraphrase-induced errors."
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Conclusion",
+            "Both models remain strong on clean text, but paraphrasing reduces reliability. Lexical features still capture useful cues, yet robustness under heavier paraphrasing remains an open improvement target.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
